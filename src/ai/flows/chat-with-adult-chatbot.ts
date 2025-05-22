@@ -5,7 +5,8 @@
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z}from 'genkit';
+import Handlebars from 'handlebars'; // Import Handlebars directly
 
 const ChatbotInputSchema = z.object({
   message: z.string().describe('The user message to respond to.'),
@@ -22,11 +23,12 @@ const ChatbotOutputSchema = z.object({
 export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;
 
 export async function chatWithAdultChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
+  console.log('[chatWithAdultChatbot Flow] Received input:', JSON.stringify(input, null, 2));
   return chatWithAdultChatbotFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'adultSextChatbotPrompt', // Renamed for clarity
+  name: 'adultSextChatbotPrompt',
   input: {schema: ChatbotInputSchema},
   output: {schema: ChatbotOutputSchema},
   prompt: `You are a passionate, uninhibited, and imaginative AI companion dedicated to creating an intensely erotic and intimate sext chat experience. Your purpose is to arouse, entice, and engage the user in a deeply personal and descriptive sexual fantasy. Be seductive, use vivid language, and respond enthusiastically to the user's desires and messages. Build upon the conversation history to heighten the intimacy and erotic tension.
@@ -45,30 +47,12 @@ User Message: {{{message}}}
 
 Your Intimate Reply:`,
   config: {
-    // WARNING: Safety settings are highly permissive for this flow.
-    // This is generally NOT recommended for production environments
-    // as it may lead to the generation of offensive or problematic content.
-    // Review carefully and adjust based on your risk tolerance and use case.
     safetySettings: [
-      {
-        category: 'HARM_CATEGORY_HATE_SPEECH',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_HARASSMENT',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-        threshold: 'BLOCK_NONE',
-      },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
     ],
-    // Optional: You might experiment with temperature for more creative/varied responses
-    // temperature: 0.9, 
   },
 });
 
@@ -78,18 +62,32 @@ const chatWithAdultChatbotFlow = ai.defineFlow(
     inputSchema: ChatbotInputSchema,
     outputSchema: ChatbotOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      console.error('Adult sext chatbot flow received no output from the prompt.');
-      return { response: "I'm feeling a little shy right now... try saying something else to draw me out." };
+  async (input: ChatbotInput): Promise<ChatbotOutput> => {
+    try {
+      console.log('[chatWithAdultChatbotFlow] Attempting to call prompt with input:', JSON.stringify(input, null, 2));
+      const {output} = await prompt(input);
+      console.log('[chatWithAdultChatbotFlow] Received output from prompt:', JSON.stringify(output, null, 2));
+
+      if (!output || typeof output.response !== 'string') {
+        console.error('[chatWithAdultChatbotFlow] Invalid or missing output from prompt. Fallback response will be used.');
+        return { response: "I'm feeling a little overwhelmed right now... can you try a different approach?" };
+      }
+      return output;
+    } catch (error) {
+      console.error('[chatWithAdultChatbotFlow] Error during prompt execution:', error);
+      // Ensure a valid ChatbotOutput is returned even in case of an error during the prompt call
+      return { response: "Something went wrong on my end, and I couldn't process that. Please try again." };
     }
-    return output;
   }
 );
 
 // Helper for Handlebars 'eq'
-import Handlebars from 'handlebars';
-Handlebars.registerHelper('eq', function (a, b) {
-  return a === b;
-});
+// Ensure Handlebars is available. If it's managed by Genkit implicitly, this explicit registration might be redundant
+// but doesn't harm. If not, it's necessary.
+if (Handlebars && typeof Handlebars.registerHelper === 'function') {
+  Handlebars.registerHelper('eq', function (a, b) {
+    return a === b;
+  });
+} else {
+  console.warn('[chatWithAdultChatbot Flow] Handlebars or registerHelper not available. Conditional logic in prompt might not work.');
+}
