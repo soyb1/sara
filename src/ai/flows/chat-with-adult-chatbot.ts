@@ -1,3 +1,4 @@
+
 // This is an AI-powered chatbot designed for adult conversational experiences.
 
 'use server';
@@ -31,13 +32,32 @@ const prompt = ai.definePrompt({
 
 Conversation History:
 {{#each conversationHistory}}
-  {{#if (eq role \"user\")}}User: {{content}}{{/if}}
-  {{#if (eq role \"assistant\")}}Assistant: {{content}}{{/if}}
+  {{role}}: {{content}}
 {{/each}}
 
 User Message: {{{message}}}
 
 Chatbot Response:`,
+  config: { // NOTE: Safety settings relaxed for this flow. Review for production.
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_HATE_SPEECH',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_NONE',
+      },
+    ],
+  },
 });
 
 const chatWithAdultChatbotFlow = ai.defineFlow(
@@ -48,6 +68,13 @@ const chatWithAdultChatbotFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      // Handle cases where the model might return nothing or an unexpected structure
+      // even if safety settings are relaxed.
+      console.error('Adult chatbot flow received no output from the prompt.');
+      return { response: "I'm sorry, I couldn't generate a response right now." };
+    }
+    return output;
   }
 );
+
