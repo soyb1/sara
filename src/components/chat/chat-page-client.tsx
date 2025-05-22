@@ -129,7 +129,7 @@ export default function ChatPageClient() {
               >
                 {msg.role === "assistant" && (
                   <Avatar className="h-10 w-10 border-2 border-primary">
-                    <AvatarImage src="/my-ai-gf-profile.jpg" alt="SARA" data-ai-hint="woman portrait" />
+                    <AvatarImage src="/sara-profile.jpg" alt="SARA" data-ai-hint="woman portrait" />
                     <AvatarFallback>
                       <Bot className="text-primary" />
                     </AvatarFallback>
@@ -163,7 +163,7 @@ export default function ChatPageClient() {
             {isLoading && (
               <div className="flex items-start gap-3 justify-start">
                 <Avatar className="h-10 w-10 border-2 border-primary">
-                   <AvatarImage src="/my-ai-gf-profile.jpg" alt="SARA" data-ai-hint="woman portrait" />
+                   <AvatarImage src="/sara-profile.jpg" alt="SARA" data-ai-hint="woman portrait" />
                   <AvatarFallback>
                     <Bot className="text-primary animate-pulse" />
                   </AvatarFallback>
