@@ -23,7 +23,7 @@ const ChatbotOutputSchema = z.object({
 export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;
 
 export async function chatWithAdultChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
-  console.log('[chatWithAdultChatbot Flow] Received input:', JSON.stringify(input, null, 2));
+  console.log('[chatWithAdultChatbot Exported Function] Received input:', JSON.stringify(input, null, 2));
   return chatWithAdultChatbotFlow(input);
 }
 
@@ -36,8 +36,7 @@ const prompt = ai.definePrompt({
 Conversation History:
 {{#if conversationHistory}}
 {{#each conversationHistory}}
-  {{#if (eq role "user")}}User: {{content}}{{/if}}
-  {{#if (eq role "assistant")}}You: {{content}}{{/if}}
+  {{role}}: {{content}}
 {{/each}}
 {{else}}
 This is the beginning of our secret encounter... What are you thinking?
@@ -63,31 +62,33 @@ const chatWithAdultChatbotFlow = ai.defineFlow(
     outputSchema: ChatbotOutputSchema,
   },
   async (input: ChatbotInput): Promise<ChatbotOutput> => {
+    console.log('[chatWithAdultChatbotFlow RUNNING] Attempting to call prompt with input:', JSON.stringify(input, null, 2));
     try {
-      console.log('[chatWithAdultChatbotFlow] Attempting to call prompt with input:', JSON.stringify(input, null, 2));
       const {output} = await prompt(input);
       console.log('[chatWithAdultChatbotFlow] Received output from prompt:', JSON.stringify(output, null, 2));
 
-      if (!output || typeof output.response !== 'string') {
-        console.error('[chatWithAdultChatbotFlow] Invalid or missing output from prompt. Fallback response will be used.');
-        return { response: "I'm feeling a little overwhelmed right now... can you try a different approach?" };
+      if (!output || typeof output.response !== 'string' || output.response.trim() === "") {
+        const errorDetail = `Output received: ${JSON.stringify(output)}`;
+        console.error('[chatWithAdultChatbotFlow] AI returned an empty or invalid response structure.', errorDetail);
+        return { response: "I seem to be having trouble forming a reply right now. Please try sending a different message or try again in a moment. (Technical: AI Output Invalid/Empty)" };
       }
       return output;
-    } catch (error) {
-      console.error('[chatWithAdultChatbotFlow] Error during prompt execution:', error);
-      // Ensure a valid ChatbotOutput is returned even in case of an error during the prompt call
-      return { response: "Something went wrong on my end, and I couldn't process that. Please try again." };
+    } catch (error: any) {
+      const errorMessage = error?.message || JSON.stringify(error);
+      console.error('[chatWithAdultChatbotFlow] Critical error during prompt execution:', errorMessage, error);
+      return { response: `A critical error occurred on my side while trying to think (Details: ${errorMessage.substring(0,100)}...). Please try again later. (Technical: AI Call Failed)` };
     }
   }
 );
 
-// Helper for Handlebars 'eq'
-// Ensure Handlebars is available. If it's managed by Genkit implicitly, this explicit registration might be redundant
-// but doesn't harm. If not, it's necessary.
+// Helper for Handlebars 'eq' - though not strictly needed for the current simplified prompt history.
+// Genkit's built-in Handlebars should manage standard helpers like #if and #each.
 if (Handlebars && typeof Handlebars.registerHelper === 'function') {
-  Handlebars.registerHelper('eq', function (a, b) {
-    return a === b;
-  });
+  if (!Handlebars.helpers.eq) { // Register only if not already registered
+    Handlebars.registerHelper('eq', function (a, b) {
+      return a === b;
+    });
+  }
 } else {
-  console.warn('[chatWithAdultChatbot Flow] Handlebars or registerHelper not available. Conditional logic in prompt might not work.');
+  console.warn('[chatWithAdultChatbot Flow] Handlebars or registerHelper not available. Conditional logic in prompt might not work if complex helpers are used.');
 }
