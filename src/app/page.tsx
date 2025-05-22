@@ -7,7 +7,7 @@ export default function HomePage() {
     <main className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(theme(colors.primary),transparent_2px)] [background-size:32px_32px]"></div>
       <h1 className="text-6xl font-bold mb-6 text-primary tracking-tight">
-        Welcome to <span className="text-accent">Crimson Canvas</span>
+        Welcome to <span className="text-accent">My AI GF</span>
       </h1>
       <p className="text-xl mb-8 max-w-2xl text-foreground/90">
         Explore AI-driven adult conversational experiences and generate unique NSFW images.
@@ -25,7 +25,7 @@ export default function HomePage() {
         </Button>
       </div>
       <footer className="absolute bottom-8 text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} Crimson Canvas. All rights reserved.
+        &copy; {new Date().getFullYear()} My AI GF. All rights reserved.
       </footer>
     </main>
   );
