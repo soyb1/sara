@@ -98,10 +98,10 @@ export default function ChatPageClient() {
       });
       // Optional: re-add user message to input if submission failed server-side after optimistic update
       // form.setValue("message", data.message);
-      // setMessages(prev => prev.filter(m => m.id !== userMessage.id)); 
+      // setMessages(prev => prev.filter(m => m.id !== userMessage.id));
     }
   };
-  
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -113,7 +113,7 @@ export default function ChatPageClient() {
     <Card className="w-full max-w-3xl mx-auto h-[calc(100vh-8rem)] flex flex-col shadow-2xl">
       <CardHeader>
         <CardTitle className="flex items-center text-2xl">
-          <Bot className="mr-2 h-7 w-7 text-primary" /> Adult Chatbot
+          <Bot className="mr-2 h-7 w-7 text-primary" /> SARA
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden p-0">
