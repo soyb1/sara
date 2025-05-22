@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'My AI GF',
+  title: 'SARA',
   description: 'AI-driven adult conversational experiences and image generation.',
 };
 

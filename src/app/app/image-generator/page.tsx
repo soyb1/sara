@@ -2,7 +2,7 @@ import ImageGeneratorPageClient from '@/components/image-generator/image-generat
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'My AI GF - Image Generator',
+  title: 'SARA - Image Generator',
   description: 'Generate unique NSFW images from text prompts.',
 };
 

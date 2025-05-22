@@ -49,7 +49,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <Link href="/app/chat" className="flex items-center gap-2">
               <Bot className="h-8 w-8 text-primary" />
               <h1 className="text-2xl font-semibold text-foreground group-data-[collapsible=icon]:hidden">
-                My AI GF
+                SARA
               </h1>
             </Link>
           <SidebarTrigger className="md:hidden group-data-[collapsible=icon]:hidden" />
